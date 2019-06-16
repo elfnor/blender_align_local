@@ -26,6 +26,7 @@ Set Origin to Geometry and add an empty aligned with the thumb joint.
 ![](assets/readme-35b0d3a0.png)
 
 Select the thumb joint then shift select the empty
+
 ![](assets/readme-11a5cec6.png)
 
 Run the add-on, the local axis of the the thumb joint is now aligned with the empty.
