@@ -23,7 +23,7 @@ bl_info = {
     "version": (0, 2),
     "blender": (2,80,61),
     "location": "3D View > Object > Transform > Align local axis",
-    "description": "Operator to set selected object's local axis to align with active object, custom transform or 3D cursor",
+    "description": "Operator to realign selected object's local axis",
     "warning": "",
     "category": "Object",
 }
@@ -38,10 +38,11 @@ from mathutils import Matrix
 
 def align_local(obj, euler_rot):
     """
-    rotate the local axis of obj to align in the direction given by euler_rot
-    the object's vertices and origin should remain in the same location in world space
-    any scale on obj will be applied
+    Rotate the local axis of obj to align in the direction given by euler_rot.
+    The object's vertices and origin should remain in the same location in world space.
+    Any scale on obj will be applied.
     """
+        
     # separate the object's world matrix into a translation matrix and a combined scale rotation matrix
     mw = obj.matrix_world
     mwsr = mw.to_3x3().to_4x4()
@@ -50,7 +51,11 @@ def align_local(obj, euler_rot):
     mrot = euler_rot.to_matrix().to_4x4() 
     # apply the transforms to the data and to object
     obj.matrix_world = mwl @ mrot   
-    obj.data.transform(mrot.transposed() @ mwsr)
+    obj.data.transform(mrot.inverted() @ mwsr)
+    
+    # update any children
+    for kid in obj.children:
+         kid.matrix_parent_inverse = obj.matrix_world.inverted()
     
 # ---------------------------------------------------------
 
@@ -96,7 +101,7 @@ def add_to_menu(self, context):
 
 def register():
     bpy.utils.register_class(VIEW3D_OT_align_local)
-    bpy.types.VIEW3D_MT_transform_object.append(add_to_menu)
+    # bpy.types.VIEW3D_MT_transform_object.append(add_to_menu)
     return
 
 
