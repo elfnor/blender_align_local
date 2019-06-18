@@ -51,7 +51,11 @@ def align_local(obj, euler_rot):
     mrot = euler_rot.to_matrix().to_4x4() 
     # apply the transforms to the data and to object
     obj.matrix_world = mwl @ mrot   
-    obj.data.transform(mrot.inverted() @ mwsr)
+    try:
+        obj.data.transform(mrot.inverted() @ mwsr)
+    except AttributeError:
+        # empties have no data to transform
+        pass
     
     # update any children
     for kid in obj.children:
@@ -101,7 +105,7 @@ def add_to_menu(self, context):
 
 def register():
     bpy.utils.register_class(VIEW3D_OT_align_local)
-    # bpy.types.VIEW3D_MT_transform_object.append(add_to_menu)
+    bpy.types.VIEW3D_MT_transform_object.append(add_to_menu)
     return
 
 
